@@ -12,6 +12,7 @@ type Props = {
   category: UnitCategory;
   loading?: boolean;
   error?: boolean;
+
 };
 
 type PickerTarget = 'from' | 'to' | null;

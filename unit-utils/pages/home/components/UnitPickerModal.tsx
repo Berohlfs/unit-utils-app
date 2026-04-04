@@ -1,3 +1,4 @@
+import { useEffect } from 'react';
 import {
   FlatList,
   Modal,
@@ -5,8 +6,21 @@ import {
   StyleSheet,
   Text,
   View,
+  useWindowDimensions,
 } from 'react-native';
 import { MaterialIcons } from '@expo/vector-icons';
+import Animated, {
+  useSharedValue,
+  useAnimatedStyle,
+  withTiming,
+  runOnJS,
+  Easing,
+} from 'react-native-reanimated';
+import {
+  Gesture,
+  GestureDetector,
+  GestureHandlerRootView,
+} from 'react-native-gesture-handler';
 
 import { useThemeColor } from '@/hooks/use-theme-color';
 import { Unit } from '../types';
@@ -19,6 +33,9 @@ type Props = {
   onClose: () => void;
 };
 
+const SHEET_HEIGHT_RATIO = 0.6;
+const DISMISS_THRESHOLD = 80;
+
 export default function UnitPickerModal({
   visible,
   units,
@@ -26,6 +43,9 @@ export default function UnitPickerModal({
   onSelect,
   onClose,
 }: Props) {
+  const { height: windowHeight } = useWindowDimensions();
+  const sheetHeight = windowHeight * SHEET_HEIGHT_RATIO;
+
   const background = useThemeColor({}, 'background');
   const text = useThemeColor({}, 'text');
   const textSecondary = useThemeColor({}, 'textSecondary');
@@ -33,62 +53,119 @@ export default function UnitPickerModal({
   const border = useThemeColor({}, 'border');
   const surface = useThemeColor({}, 'surface');
 
+  const translateY = useSharedValue(sheetHeight);
+
+  useEffect(() => {
+    if (visible) {
+      translateY.value = withTiming(0, {
+        duration: 300,
+        easing: Easing.out(Easing.cubic),
+      });
+    }
+  }, [visible, sheetHeight, translateY]);
+
+  const close = () => {
+    translateY.value = withTiming(
+      sheetHeight,
+      { duration: 250, easing: Easing.in(Easing.cubic) },
+      () => {
+        runOnJS(onClose)();
+      }
+    );
+  };
+
+  const panGesture = Gesture.Pan()
+    .onUpdate((e) => {
+      if (e.translationY > 0) {
+        translateY.value = e.translationY;
+      }
+    })
+    .onEnd((e) => {
+      if (e.translationY > DISMISS_THRESHOLD) {
+        runOnJS(close)();
+      } else {
+        translateY.value = withTiming(0, {
+          duration: 200,
+          easing: Easing.out(Easing.cubic),
+        });
+      }
+    });
+
+  const sheetStyle = useAnimatedStyle(() => ({
+    transform: [{ translateY: translateY.value }],
+  }));
+
   return (
     <Modal
       visible={visible}
       transparent
-      animationType="slide"
-      onRequestClose={onClose}
+      animationType="fade"
+      onRequestClose={close}
+      statusBarTranslucent
     >
-      <Pressable style={styles.overlay} onPress={onClose}>
-        <View style={[styles.sheet, { backgroundColor: background }]}>
-          <View style={[styles.handle, { backgroundColor: border }]} />
-          <Text style={[styles.title, { color: text }]}>Select Unit</Text>
-          <FlatList
-            data={units}
-            keyExtractor={(item) => item.key}
-            renderItem={({ item }) => {
-              const isSelected = item.key === selectedKey;
-              return (
-                <Pressable
-                  onPress={() => onSelect(item)}
-                  style={[
-                    styles.option,
-                    {
-                      backgroundColor: isSelected ? surface : 'transparent',
-                    },
-                  ]}
-                >
-                  <View style={styles.optionLeft}>
-                    <Text style={[styles.optionLabel, { color: text }]}>
-                      {item.label}
-                    </Text>
-                    <Text
-                      style={[
-                        styles.optionAbbr,
-                        { color: textSecondary },
-                      ]}
-                    >
-                      {item.abbreviation}
-                    </Text>
-                  </View>
-                  {isSelected && (
-                    <MaterialIcons name="check" size={20} color={tint} />
-                  )}
-                </Pressable>
-              );
-            }}
-          />
-        </View>
-      </Pressable>
+      <GestureHandlerRootView style={styles.container}>
+        <Pressable style={styles.overlay} onPress={close} />
+
+        <GestureDetector gesture={panGesture}>
+          <Animated.View
+            style={[
+              styles.sheet,
+              { backgroundColor: background, height: sheetHeight },
+              sheetStyle,
+            ]}
+          >
+            <View style={[styles.handle, { backgroundColor: border }]} />
+            <Text style={[styles.title, { color: text }]}>Select Unit</Text>
+            <FlatList
+              data={units}
+              keyExtractor={(item) => item.key}
+              bounces={false}
+              renderItem={({ item }) => {
+                const isSelected = item.key === selectedKey;
+                return (
+                  <Pressable
+                    onPress={() => {
+                      onSelect(item);
+                      close();
+                    }}
+                    style={[
+                      styles.option,
+                      {
+                        backgroundColor: isSelected ? surface : 'transparent',
+                      },
+                    ]}
+                  >
+                    <View style={styles.optionLeft}>
+                      <Text style={[styles.optionLabel, { color: text }]}>
+                        {item.label}
+                      </Text>
+                      <Text
+                        style={[styles.optionAbbr, { color: textSecondary }]}
+                      >
+                        {item.abbreviation}
+                      </Text>
+                    </View>
+                    {isSelected && (
+                      <MaterialIcons name="check" size={20} color={tint} />
+                    )}
+                  </Pressable>
+                );
+              }}
+            />
+          </Animated.View>
+        </GestureDetector>
+      </GestureHandlerRootView>
     </Modal>
   );
 }
 
 const styles = StyleSheet.create({
-  overlay: {
+  container: {
     flex: 1,
     justifyContent: 'flex-end',
+  },
+  overlay: {
+    ...StyleSheet.absoluteFillObject,
     backgroundColor: 'rgba(0,0,0,0.4)',
   },
   sheet: {
@@ -96,7 +173,6 @@ const styles = StyleSheet.create({
     borderTopRightRadius: 20,
     paddingTop: 12,
     paddingBottom: 40,
-    maxHeight: '60%',
   },
   handle: {
     width: 36,

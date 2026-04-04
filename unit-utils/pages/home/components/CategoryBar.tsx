@@ -1,4 +1,4 @@
-import { ScrollView, StyleSheet } from 'react-native';
+import { StyleSheet, View } from 'react-native';
 
 import { UnitCategory } from '../types';
 import CategoryPill from './CategoryPill';
@@ -15,11 +15,7 @@ export default function CategoryBar({
   onSelect,
 }: Props) {
   return (
-    <ScrollView
-      horizontal
-      showsHorizontalScrollIndicator={false}
-      contentContainerStyle={styles.container}
-    >
+    <View style={styles.container}>
       {categories.map((cat) => (
         <CategoryPill
           key={cat.key}
@@ -28,12 +24,14 @@ export default function CategoryBar({
           onPress={() => onSelect(cat.key)}
         />
       ))}
-    </ScrollView>
+    </View>
   );
 }
 
 const styles = StyleSheet.create({
   container: {
+    flexDirection: 'row',
+    flexWrap: 'wrap',
     paddingHorizontal: 20,
     gap: 8,
   },
