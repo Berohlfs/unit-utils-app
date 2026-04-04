@@ -18,8 +18,7 @@ import CategoryBar from './components/CategoryBar';
 import ConverterPanel from './components/ConverterPanel';
 
 export default function HomePage() {
-  const background = useThemeColor({}, 'background');
-  const text = useThemeColor({}, 'text');
+  const { background, text } = useThemeColor();
 
   const {
     category: currencyCategory,

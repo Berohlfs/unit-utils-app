@@ -22,9 +22,7 @@ export default function ConverterPanel({
   loading,
   error,
 }: Props) {
-  const border = useThemeColor({}, 'border');
-  const textSecondary = useThemeColor({}, 'textSecondary');
-  const tint = useThemeColor({}, 'tint');
+  const { border, textSecondary, tint } = useThemeColor();
 
   const [fromUnitKey, setFromUnitKey] = useState(
     category.units[0]?.key ?? ''

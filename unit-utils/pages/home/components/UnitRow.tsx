@@ -21,12 +21,8 @@ export default function UnitRow({
   onPressUnit,
   editable = true,
 }: Props) {
-  const text = useThemeColor({}, 'text');
-  const textSecondary = useThemeColor({}, 'textSecondary');
-  const inputBackground = useThemeColor({}, 'inputBackground');
-  const tint = useThemeColor({}, 'tint');
-  const border = useThemeColor({}, 'border');
-  const placeholder = useThemeColor({}, 'placeholder');
+  const { text, textSecondary, inputBackground, tint, border, placeholder } =
+    useThemeColor();
 
   return (
     <View style={styles.container}>

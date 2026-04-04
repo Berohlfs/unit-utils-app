@@ -46,12 +46,8 @@ export default function UnitPickerModal({
   const { height: windowHeight } = useWindowDimensions();
   const sheetHeight = windowHeight * SHEET_HEIGHT_RATIO;
 
-  const background = useThemeColor({}, 'background');
-  const text = useThemeColor({}, 'text');
-  const textSecondary = useThemeColor({}, 'textSecondary');
-  const tint = useThemeColor({}, 'tint');
-  const border = useThemeColor({}, 'border');
-  const surface = useThemeColor({}, 'surface');
+  const { background, text, textSecondary, tint, border, surface } =
+    useThemeColor();
 
   const translateY = useSharedValue(sheetHeight);
 

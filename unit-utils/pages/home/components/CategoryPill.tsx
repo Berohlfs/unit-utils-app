@@ -12,11 +12,8 @@ type Props = {
 };
 
 export default function CategoryPill({ category, isSelected, onPress }: Props) {
-  const surface = useThemeColor({}, 'surface');
-  const surfaceActive = useThemeColor({}, 'surfaceActive');
-  const surfaceActiveText = useThemeColor({}, 'surfaceActiveText');
-  const text = useThemeColor({}, 'text');
-  const icon = useThemeColor({}, 'icon');
+  const { surface, surfaceActive, surfaceActiveText, text, icon } =
+    useThemeColor();
 
   const handlePress = () => {
     Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light);

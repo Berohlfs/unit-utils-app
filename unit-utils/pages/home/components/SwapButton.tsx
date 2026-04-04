@@ -14,8 +14,7 @@ type Props = {
 };
 
 export default function SwapButton({ onPress }: Props) {
-  const surface = useThemeColor({}, 'surface');
-  const tint = useThemeColor({}, 'tint');
+  const { surface, tint } = useThemeColor();
   const rotation = useSharedValue(0);
 
   const animatedStyle = useAnimatedStyle(() => ({
