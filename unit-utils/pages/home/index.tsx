@@ -2,6 +2,7 @@ import { useMemo, useState } from 'react';
 import {
   Image,
   KeyboardAvoidingView,
+  Linking,
   Platform,
   ScrollView,
   StyleSheet,
@@ -18,7 +19,7 @@ import CategoryBar from './components/CategoryBar';
 import ConverterPanel from './components/ConverterPanel';
 
 export default function HomePage() {
-  const { background, text } = useThemeColor();
+  const { background, text, textSecondary, tint } = useThemeColor();
 
   const {
     category: currencyCategory,
@@ -69,6 +70,20 @@ export default function HomePage() {
             loading={isCurrency ? currencyLoading : undefined}
             error={isCurrency ? currencyError : undefined}
           />
+
+          <View style={styles.footer}>
+            <Text style={[styles.footerText, { color: textSecondary }]}>
+              By{' '}
+              <Text
+                style={[styles.footerLink, { color: tint }]}
+                onPress={() =>
+                  Linking.openURL('https://www.bernardorohlfs.com/')
+                }
+              >
+                Bernardo Rohlfs
+              </Text>
+            </Text>
+          </View>
         </ScrollView>
       </KeyboardAvoidingView>
     </SafeAreaView>
@@ -83,7 +98,8 @@ const styles = StyleSheet.create({
     flex: 1,
   },
   scroll: {
-    paddingBottom: 40,
+    flexGrow: 1,
+    paddingBottom: 20,
   },
   header: {
     flexDirection: 'row',
@@ -101,5 +117,18 @@ const styles = StyleSheet.create({
   title: {
     fontSize: 28,
     fontWeight: '700',
+  },
+  footer: {
+    alignItems: 'center',
+    marginTop: 'auto' as const,
+    paddingTop: 40,
+    paddingBottom: 16,
+  },
+  footerText: {
+    fontSize: 13,
+  },
+  footerLink: {
+    textDecorationLine: 'underline' as const,
+    fontSize: 13,
   },
 });
