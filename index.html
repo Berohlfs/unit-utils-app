@@ -108,14 +108,17 @@
     <p>
       The app fetches currency exchange rates from a public API
       (<a href="https://frankfurter.dev" target="_blank" rel="noopener">frankfurter.dev</a>)
-      to support currency conversions. This request does not include any personal or device information —
-      it is a simple data request for current exchange rates.
+      to support currency conversions. We do not intentionally send any personal or device information
+      in these requests. However, as with any network request, the service provider may receive
+      technical metadata such as your IP address. We encourage you to review the provider's own
+      privacy practices for more details.
     </p>
 
     <h2>Data Storage</h2>
     <p>
-      Unit Utils does not store any data on your device or on remote servers. All conversions are
-      calculated locally and nothing is saved between sessions.
+      Unit Utils does not persist any data to your device or to remote servers. All conversions are
+      calculated locally in memory. Currency exchange rates are temporarily held in memory while the
+      app is open and are discarded when the app is closed. Nothing is saved between sessions.
     </p>
 
     <h2>Children's Privacy</h2>
@@ -134,7 +137,7 @@
 
     <p>
       If you have any questions, feel free to reach out at
-      <a href="https://www.bernardorohlfs.com" target="_blank" rel="noopener">bernardorohlfs.com</a>.
+      <a href="mailto:berohlfs@gmail.com">berohlfs@gmail.com</a>.
     </p>
   </main>
 </body>
