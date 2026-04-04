@@ -31,6 +31,7 @@ type Props = {
   onChangeValue: (text: string) => void;
   onPressUnit: () => void;
   editable?: boolean;
+  hint?: string | null;
 };
 
 export default function UnitRow({
@@ -40,6 +41,7 @@ export default function UnitRow({
   onChangeValue,
   onPressUnit,
   editable = true,
+  hint,
 }: Props) {
   const { text, textSecondary, inputBackground, tint, border, placeholder } =
     useThemeColor();
@@ -64,23 +66,30 @@ export default function UnitRow({
           </Text>
           <MaterialIcons name="keyboard-arrow-down" size={20} color={tint} />
         </Pressable>
-        <TextInput
-          style={[
-            styles.input,
-            {
-              backgroundColor: inputBackground,
-              color: text,
-              borderColor: border,
-            },
-          ]}
-          value={value}
-          onChangeText={handleChangeText}
-          inputMode="decimal"
-          placeholder="0"
-          placeholderTextColor={placeholder}
-          editable={editable}
-          selectTextOnFocus
-        />
+        <View style={styles.inputWrapper}>
+          <TextInput
+            style={[
+              styles.input,
+              {
+                backgroundColor: inputBackground,
+                color: text,
+                borderColor: border,
+              },
+            ]}
+            value={value}
+            onChangeText={handleChangeText}
+            inputMode="decimal"
+            placeholder="0"
+            placeholderTextColor={placeholder}
+            editable={editable}
+            selectTextOnFocus
+          />
+          {hint ? (
+            <Text style={[styles.hint, { color: textSecondary }]}>
+              = {hint}
+            </Text>
+          ) : null}
+        </View>
       </View>
     </View>
   );
@@ -97,14 +106,16 @@ const styles = StyleSheet.create({
   },
   row: {
     flexDirection: 'row',
+    alignItems: 'flex-start',
     gap: 10,
   },
   unitPicker: {
     flexDirection: 'row',
     alignItems: 'center',
+    justifyContent: 'center',
     gap: 2,
     paddingHorizontal: 12,
-    paddingVertical: 12,
+    height: 52,
     borderRadius: 12,
     borderWidth: 1,
     minWidth: 72,
@@ -113,13 +124,21 @@ const styles = StyleSheet.create({
     fontSize: 16,
     fontWeight: '600',
   },
-  input: {
+  inputWrapper: {
     flex: 1,
+  },
+  input: {
     fontSize: 24,
     fontWeight: '500',
     paddingHorizontal: 16,
     paddingVertical: 12,
     borderRadius: 12,
     borderWidth: 1,
+  },
+  hint: {
+    fontSize: 13,
+    marginLeft: 4,
+    marginTop: 6,
+    fontStyle: 'italic',
   },
 });

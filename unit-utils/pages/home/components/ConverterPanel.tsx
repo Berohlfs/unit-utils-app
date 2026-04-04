@@ -3,7 +3,7 @@ import { ActivityIndicator, StyleSheet, Text, View } from 'react-native';
 
 import { useThemeColor } from '@/hooks/use-theme-color';
 import { UnitCategory, Unit } from '../types';
-import { convert, formatResult } from '../helpers/convert';
+import { convert, formatResult, getCompoundHint } from '../helpers/convert';
 import UnitRow from './UnitRow';
 import SwapButton from './SwapButton';
 import UnitPickerModal from './UnitPickerModal';
@@ -37,15 +37,27 @@ export default function ConverterPanel({
   const fromUnit = category.units.find((u) => u.key === fromUnitKey);
   const toUnit = category.units.find((u) => u.key === toUnitKey);
 
-  const computedValue = useMemo(() => {
-    if (!fromUnit || !toUnit) return '';
+  const { computedValue, fromHint, toHint } = useMemo(() => {
+    if (!fromUnit || !toUnit)
+      return { computedValue: '', fromHint: null, toHint: null };
     const num = parseFloat(inputValue);
-    if (isNaN(num)) return '';
+    if (isNaN(num))
+      return { computedValue: '', fromHint: null, toHint: null };
 
     if (activeField === 'from') {
-      return formatResult(convert(num, fromUnit, toUnit));
+      const result = convert(num, fromUnit, toUnit);
+      return {
+        computedValue: formatResult(result),
+        fromHint: getCompoundHint(fromUnit.key, num),
+        toHint: getCompoundHint(toUnit.key, result),
+      };
     } else {
-      return formatResult(convert(num, toUnit, fromUnit));
+      const result = convert(num, toUnit, fromUnit);
+      return {
+        computedValue: formatResult(result),
+        fromHint: getCompoundHint(fromUnit.key, result),
+        toHint: getCompoundHint(toUnit.key, num),
+      };
     }
   }, [inputValue, fromUnit, toUnit, activeField]);
 
@@ -102,6 +114,7 @@ export default function ConverterPanel({
         value={activeField === 'from' ? inputValue : computedValue}
         onChangeValue={handleFromChange}
         onPressUnit={() => setPickerTarget('from')}
+        hint={fromHint}
       />
 
       <SwapButton onPress={handleSwap} />
@@ -112,6 +125,7 @@ export default function ConverterPanel({
         value={activeField === 'to' ? inputValue : computedValue}
         onChangeValue={handleToChange}
         onPressUnit={() => setPickerTarget('to')}
+        hint={toHint}
       />
 
       <UnitPickerModal
