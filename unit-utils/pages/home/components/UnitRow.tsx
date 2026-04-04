@@ -4,6 +4,26 @@ import { MaterialIcons } from '@expo/vector-icons';
 import { useThemeColor } from '@/hooks/use-theme-color';
 import { Unit } from '../types';
 
+function sanitizeNumericInput(raw: string): string | null {
+  // Replace comma with dot
+  let sanitized = raw.replace(',', '.');
+
+  // Remove anything that isn't a digit or dot
+  sanitized = sanitized.replace(/[^0-9.]/g, '');
+
+  // Allow only one dot
+  const parts = sanitized.split('.');
+  if (parts.length > 2) {
+    sanitized = parts[0] + '.' + parts.slice(1).join('');
+  }
+
+  // Reject if nothing useful remains
+  if (sanitized === '') return '';
+  if (sanitized !== raw.replace(',', '.')) return sanitized;
+
+  return sanitized;
+}
+
 type Props = {
   label: string;
   unit: Unit;
@@ -23,6 +43,13 @@ export default function UnitRow({
 }: Props) {
   const { text, textSecondary, inputBackground, tint, border, placeholder } =
     useThemeColor();
+
+  const handleChangeText = (raw: string) => {
+    const sanitized = sanitizeNumericInput(raw);
+    if (sanitized !== null) {
+      onChangeValue(sanitized);
+    }
+  };
 
   return (
     <View style={styles.container}>
@@ -47,8 +74,8 @@ export default function UnitRow({
             },
           ]}
           value={value}
-          onChangeText={onChangeValue}
-          keyboardType="decimal-pad"
+          onChangeText={handleChangeText}
+          inputMode="decimal"
           placeholder="0"
           placeholderTextColor={placeholder}
           editable={editable}
